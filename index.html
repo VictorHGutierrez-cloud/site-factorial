@@ -918,7 +918,7 @@
         }
 
         #clients-carousel .slide {
-            flex: 0 0 calc(25% - 1rem);
+            flex: 0 0 calc(33.333% - 1rem);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -963,10 +963,10 @@
 
         /* Responsive: fewer logos per view on small screens */
         @media (max-width: 900px) {
-            #clients-carousel .slide { flex: 0 0 calc(33.333% - 1rem); }
+            #clients-carousel .slide { flex: 0 0 calc(50% - 1rem); }
         }
         @media (max-width: 600px) {
-            #clients-carousel .slide { flex: 0 0 calc(50% - 1rem); }
+            #clients-carousel .slide { flex: 0 0 calc(100% - 1rem); }
         }
 
         /* Respect reduced motion preference */
@@ -2774,7 +2774,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (nextBtn) nextBtn.addEventListener('click', () => { slideIndex = clampIndex(slideIndex + 1); updateCarousel(); });
 
         window.addEventListener('resize', () => { setTimeout(updateCarousel, 50); });
-        // Auto-scroll every 4s
+        // Auto-scroll every 4s (adjusted for 3-per-view)
         setInterval(() => { if (document.hidden) return; slideIndex = clampIndex(slideIndex + 1); updateCarousel(); }, 4000);
     })();
     </script>
