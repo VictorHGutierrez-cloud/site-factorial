@@ -895,6 +895,84 @@
         }
     </style>
 
+    <style>
+        /* Client logos carousel */
+        #clients-carousel {
+            max-width: 1100px;
+            margin: 2.5rem auto;
+            position: relative;
+            background: transparent;
+            padding: 1rem 0;
+        }
+
+        #clients-carousel .viewport {
+            overflow: hidden;
+            width: 100%;
+        }
+
+        #clients-carousel .track {
+            display: flex;
+            gap: 1rem;
+            transition: transform 0.5s ease;
+            will-change: transform;
+        }
+
+        #clients-carousel .slide {
+            flex: 0 0 calc(25% - 1rem);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f7f7f7;
+            padding: 1.25rem;
+            border-radius: 6px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+        }
+
+        #clients-carousel .slide img {
+            max-width: 100%;
+            max-height: 48px;
+            opacity: 0.85;
+            filter: grayscale(100%);
+        }
+
+        /* When using a single combined image, show via background */
+        #clients-carousel .logo-cell {
+            background-size: 300% 400%;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+
+        #clients-carousel .controls {
+            position: absolute;
+            right: 0.5rem;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        #clients-carousel .controls button {
+            background: rgba(0,0,0,0.6);
+            color: #fff;
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        /* Responsive: fewer logos per view on small screens */
+        @media (max-width: 900px) {
+            #clients-carousel .slide { flex: 0 0 calc(33.333% - 1rem); }
+        }
+        @media (max-width: 600px) {
+            #clients-carousel .slide { flex: 0 0 calc(50% - 1rem); }
+        }
+
+        /* Respect reduced motion preference */
+        @media (prefers-reduced-motion: reduce) {
+            #clients-carousel .track { transition: none !important; }
+        }
     </style>
 </head>
 <body>
@@ -1950,6 +2028,30 @@ document.addEventListener("DOMContentLoaded", () => {
     </div>
 
     <!-- GSAP Animation (Local, sem afetar outros cards) -->
+    <!-- Clients carousel -->
+    <section id="clients-carousel" aria-label="Clientes que usam a Factorial">
+        <div class="viewport">
+            <div class="track" id="clientsTrack">
+                <div class="slide logo-cell" role="img" aria-label="Unimed" style="background-image:url('assets/clientes/clientes.png'); background-position: 0% 0%; background-size:300% 400%; background-repeat:no-repeat;"></div>
+                <div class="slide logo-cell" role="img" aria-label="Rock in Rio" style="background-image:url('assets/clientes/clientes.png'); background-position: 50% 0%; background-size:300% 400%; background-repeat:no-repeat;"></div>
+                <div class="slide logo-cell" role="img" aria-label="Grupo Boticário" style="background-image:url('assets/clientes/clientes.png'); background-position: 100% 0%; background-size:300% 400%; background-repeat:no-repeat;"></div>
+                <div class="slide logo-cell" role="img" aria-label="Ambev" style="background-image:url('assets/clientes/clientes.png'); background-position: 0% 33.333%; background-size:300% 400%; background-repeat:no-repeat;"></div>
+                <div class="slide logo-cell" role="img" aria-label="Sousmile" style="background-image:url('assets/clientes/clientes.png'); background-position: 50% 33.333%; background-size:300% 400%; background-repeat:no-repeat;"></div>
+                <div class="slide logo-cell" role="img" aria-label="Booking.com" style="background-image:url('assets/clientes/clientes.png'); background-position: 100% 33.333%; background-size:300% 400%; background-repeat:no-repeat;"></div>
+                <div class="slide logo-cell" role="img" aria-label="MapleBear" style="background-image:url('assets/clientes/clientes.png'); background-position: 0% 66.666%; background-size:300% 400%; background-repeat:no-repeat;"></div>
+                <div class="slide logo-cell" role="img" aria-label="Bilheteria Digital" style="background-image:url('assets/clientes/clientes.png'); background-position: 50% 66.666%; background-size:300% 400%; background-repeat:no-repeat;"></div>
+                <div class="slide logo-cell" role="img" aria-label="Salú" style="background-image:url('assets/clientes/clientes.png'); background-position: 100% 66.666%; background-size:300% 400%; background-repeat:no-repeat;"></div>
+                <div class="slide logo-cell" role="img" aria-label="Gringo" style="background-image:url('assets/clientes/clientes.png'); background-position: 0% 100%; background-size:300% 400%; background-repeat:no-repeat;"></div>
+                <div class="slide logo-cell" role="img" aria-label="Skelt" style="background-image:url('assets/clientes/clientes.png'); background-position: 50% 100%; background-size:300% 400%; background-repeat:no-repeat;"></div>
+                <div class="slide logo-cell" role="img" aria-label="Extra" style="background-image:url('assets/clientes/clientes.png'); background-position: 100% 100%; background-size:300% 400%; background-repeat:no-repeat;"></div>
+            </div>
+        </div>
+        <div class="controls">
+            <button id="clientsPrev" aria-label="Anterior">‹</button>
+            <button id="clientsNext" aria-label="Próximo">›</button>
+        </div>
+    </section>
+
     <script>
         gsap.registerPlugin(ScrollTrigger);
 
@@ -2648,6 +2750,32 @@ document.addEventListener("DOMContentLoaded", () => {
                 localStorage.setItem('reducedMotion', on ? '1' : '0');
             });
         }
+        
+        /* Clients carousel behaviour */
+        const clientsTrack = document.getElementById('clientsTrack');
+        const prevBtn = document.getElementById('clientsPrev');
+        const nextBtn = document.getElementById('clientsNext');
+        let slideIndex = 0;
+
+        function updateCarousel() {
+            if (!clientsTrack) return;
+            const slide = clientsTrack.querySelector('.slide');
+            if (!slide) return;
+            const slideWidth = slide.getBoundingClientRect().width + parseFloat(getComputedStyle(clientsTrack).gap || 16);
+            clientsTrack.style.transform = `translateX(${-(slideIndex * slideWidth)}px)`;
+        }
+
+        function clampIndex(i) {
+            const slides = clientsTrack ? clientsTrack.querySelectorAll('.slide').length : 0;
+            return Math.max(0, Math.min(i, Math.max(0, slides - Math.floor((clientsTrack.parentElement.clientWidth) / (clientsTrack.querySelector('.slide').getBoundingClientRect().width || 1)))));
+        }
+
+        if (prevBtn) prevBtn.addEventListener('click', () => { slideIndex = clampIndex(slideIndex - 1); updateCarousel(); });
+        if (nextBtn) nextBtn.addEventListener('click', () => { slideIndex = clampIndex(slideIndex + 1); updateCarousel(); });
+
+        window.addEventListener('resize', () => { setTimeout(updateCarousel, 50); });
+        // Auto-scroll every 4s
+        setInterval(() => { if (document.hidden) return; slideIndex = clampIndex(slideIndex + 1); updateCarousel(); }, 4000);
     })();
     </script>
 
