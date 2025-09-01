@@ -2762,8 +2762,33 @@ document.addEventListener("DOMContentLoaded", () => {
         if (nextBtn) nextBtn.addEventListener('click', () => { slideIndex = clampIndex(slideIndex + 1); updateCarousel(); });
 
         window.addEventListener('resize', () => { setTimeout(updateCarousel, 50); });
-        // Auto-scroll every 4s (adjusted for 3-per-view)
-        setInterval(() => { if (document.hidden) return; slideIndex = clampIndex(slideIndex + 1); updateCarousel(); }, 4000);
+        // Auto-play with pause on hover
+        let autoplayInterval = 4000;
+        let autoplayHandle = null;
+
+        function startAutoplay() {
+            if (autoplayHandle) return;
+            autoplayHandle = setInterval(() => {
+                if (document.hidden) return;
+                slideIndex = clampIndex(slideIndex + 1);
+                updateCarousel();
+            }, autoplayInterval);
+        }
+
+        function stopAutoplay() {
+            if (!autoplayHandle) return;
+            clearInterval(autoplayHandle);
+            autoplayHandle = null;
+        }
+
+        const carouselEl = document.getElementById('clients-carousel');
+        if (carouselEl) {
+            carouselEl.addEventListener('mouseenter', stopAutoplay);
+            carouselEl.addEventListener('mouseleave', startAutoplay);
+        }
+
+        // start autoplay
+        startAutoplay();
     })();
     </script>
 
